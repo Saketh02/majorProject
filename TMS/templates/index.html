@@ -179,18 +179,18 @@ https://templatemo.com/tm-543-breezed
                     <div class="right-text-content">
                         <div class="col-lg-8 col-md-8 col-xs-12">
                             <div class="contact-form">
-                                <form id="contact" action="" method="get">
-                                    <div class="row">
+                                <form id="contact" action="user/login" method="POST">
+                                    <div class="row">{% csrf_token %}
                                         <div class="col-md-10 col-sm-20">
                                             <h1 style="font-family:{% static 'Raleway' %};"><strong>login</strong></h1>
 
                                             <br />
                                             <fieldset>
-                                                <input name="name" type="text" id="email"
+                                                <input name="email" type="text" id="email"
                                                     placeholder="Your Email *" required="true">
                                             </fieldset>
                                             <fieldset>
-                                                <input name="email" type="password" id="password"
+                                                <input name="password" type="password" id="password"
                                                     placeholder="Your Password *" required="true">
                                             </fieldset>
                                         </div>
@@ -292,7 +292,7 @@ https://templatemo.com/tm-543-breezed
 
                         <h1 style="font-family:{% static 'Raleway' %};"><strong>Register</strong></h1>
 
-                        <form id="contact" action="" method="get">
+                        <form id="contact" action="user/register" method="POST">
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
@@ -301,7 +301,7 @@ https://templatemo.com/tm-543-breezed
                                 </div>
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input name="phone" type="text" id="phone" placeholder="Your Phone *"
+                                        <input name="mobile" type="text" id="mobile" placeholder="Your Phone *"
                                             required="true">
                                     </fieldset>
                                 </div>
@@ -313,25 +313,25 @@ https://templatemo.com/tm-543-breezed
                                 </div>
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input name="subject" type="text" id="rollnum" placeholder="Roll Number *"
+                                        <input name="rollnum" type="text" id="rollnum" placeholder="Roll Number *"
                                             required="true">
                                     </fieldset>
                                 </div>
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input name="subject" type="text" id="pass" placeholder="Password *"
+                                        <input name="password" type="password" id="password" placeholder="Password *"
                                             required="true">
                                     </fieldset>
                                 </div>
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input name="subject" type="text" id="confPass" placeholder="Confirm Password *"
+                                        <input name="subject" type="password" id="confPass" placeholder="Confirm Password *"
                                             required="true">
                                     </fieldset>
                                 </div>
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input name="subject" type="text" id="Department"
+                                        <input name="department" type="text" id="Department"
                                             placeholder="Your Department *" required="true">
                                     </fieldset>
                                 </div>
@@ -343,9 +343,9 @@ https://templatemo.com/tm-543-breezed
                                 </div>
                                 <div class="col-lg-12">
                                     <center><label for="cars">Are you an Admin??</label>
-                                        <select id="isAdmin" name="adminornot" width="100" STYLE="width: 100px">
-                                            <option value="no">No</option>
-                                            <option value="yes">Yes</option>
+                                        <select id="isAdmin" name="isAdmin" width="100" STYLE="width: 100px">
+                                            <option value="False">No</option>
+                                            <option value="True">Yes</option>
 
                                         </select>
                                         <center />

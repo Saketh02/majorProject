@@ -1,8 +1,9 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.index, name="index"),
-    path("register/", views.RegisterView.as_view()),
-    path("login/", views.LoginView.as_view()),
+    path("register", views.RegisterAPI.as_view(), name="register"),
+    path("login", views.LoginAPI.as_view(), name="login"),
+    path("test", views.testLogin.as_view(), name="test"),
+    path("landing-page", views.landingPageAPI.as_view(), name="landing-page"),
 ]
