@@ -105,30 +105,42 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-xs-12">
                     <div class="contact-form">
-                        <form id="contact" action="" method="get">
+                        <form id="contact" action="bus-details" method="POST">
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input name="busname" type="text" id="busname" placeholder="Bus Name *"
+                                        <input name="name" type="text" id="name" placeholder="Bus Name *"
                                             required="true">
                                     </fieldset>
                                 </div>
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input name="busnumber" type="text" id="busnumber" placeholder="Bus Number *"
+                                        <input name="number" type="text" id="number" placeholder="Bus Number *"
                                             required="true">
                                     </fieldset>
                                 </div>
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input name="drivername" type="text" id="drivername" placeholder="Driver Name *"
+                                        <input name="driverName" type="text" id="driverName" placeholder="Driver Name *"
                                             required="true">
                                     </fieldset>
                                 </div>
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input name="driverphone" type="text" id="driverphone"
+                                        <input name="driverMobile" type="text" id="driverMobile"
                                             placeholder="Driver Phone Number *" required="true">
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-6 col-sm-12">
+                                    <fieldset>
+                                        <input name="inchargeName" type="text" id="inchargeName"
+                                            placeholder="Bus Incharge Name *" required="true">
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-6 col-sm-12">
+                                    <fieldset>
+                                        <input name="inchargeContact" type="text" id="inchargeContact"
+                                            placeholder="Bus Incharge Contact*" required="true">
                                     </fieldset>
                                 </div>
                                 <div class="col-lg-12">
@@ -145,6 +157,22 @@
                                 </div>
                             </div>
                         </form>
+                    </div>
+                <br>
+                    {% if messages  %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                        <center>
+                            <div class="alert alert-success" style="height:auto;width:50%">
+
+                                {{message}}
+
+                            </div>
+                        </center>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
                     </div>
                 </div>
             </div>

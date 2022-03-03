@@ -66,9 +66,9 @@
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->
                         <ul class="nav">
-                            <li class=""><a href="..\Admin\Admin.html">Home</a></li>
+                            <li class=""><a href="{% url 'landing-page' %}">Home</a></li>
 
-                            <li class=""><a href="">Logout</a></li>
+                            <li class=""><a href="{% url 'logout' %}">Logout</a></li>
                         </ul>
                         <a class='menu-trigger'>
                             <span>Menu</span>
@@ -119,25 +119,27 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-xs-12" style="height:auto;">
                     <div class="contact-form">
-                        <form id="contact" action="" method="get">
+                        <form id="contact" action="add-stops" method="POST">
                             <div class="row">
-                                <div class="col-md-6 col-sm-12" id="addtbs">
+                                
+                                <div class="col-md-6 col-sm-12" id="">
                                     <fieldset>
                                         <select name="item_id" width="" STYLE="width: 350px;height: 40px;">
-                                            {% for entry in items %}
-                                            <option value="{{ entry.id }}">Select the Bus</option>
-
+                                            <option value="" disabled selected>Select the Bus</option>
+                                            {% for entry in busses %}
+                                                <option value="{{ entry }}">{{ entry }}</option>
                                             {% endfor %}
                                         </select>
                                     </fieldset>
+                                    <div id="addtbs">
+                                    </div>
                                 </div>
                                 <br/>
                                 <div class="col-md-6 col-sm-12">
                                     <fieldset>
-                                        <input type="button" class="tbbutton" style="color:white;background-color:#5fb759;width:180px" value="Add Stop" onclick="addTextBoxes()"/>
+                                        <input type="button" class="tbbutton" style="color:white;background-color:#5fb759;width:180px" value="Add Stop" onclick="addTextBoxes(); return false;"/>
                                     </fieldset>
                                 </div>
-                                
                                 <div class="col-lg-12">
                                     <fieldset>
                                         <button type="submit" id="form-submit" class="main-button-icon">Submit
@@ -222,10 +224,10 @@
         function addTextBoxes()
         {
              var boxName="Stop "+countBox; 
-        document.getElementById('addtbs').innerHTML+='<br/><input type="text" id="'+boxName+'" value="'+boxName+'" "  /><br/>';
+        document.getElementById('addtbs').innerHTML+='<br/><input type="text" id="'+boxName+'" placeholder="'+boxName+'" "  /><br/>';
              countBox += 1;
              var boxName="Fee "+countBox1; 
-        document.getElementById('addtbs').innerHTML+='<br/><input type="text" id="'+boxName+'" value="'+boxName+'" "  /><br/>';
+        document.getElementById('addtbs').innerHTML+='<br/><input type="text" id="'+boxName+'" placeholder="'+boxName+'" "  /><br/>';
              countBox1 += 1;
         }
 
