@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from .models import Register
 from TMS.middleware import authorizationMiddleware
 from django.utils.decorators import method_decorator
+from CollegeAdmin.models import busStops
 
 # Create your views here.
 
@@ -41,13 +42,16 @@ class LoginAPI(APIView):
             "iat": datetime.datetime.utcnow(),
         }
         token = jwt.encode(payload, "secret", algorithm="HS256")
-        print(token)
         response = Response()
 
         if user.isAdmin:
             response = render(request, "Admin.html")
         else:
-            response = render(request, "student.html")
+            stops = busStops.objects.values_list("name", flat=True)
+            dataDict = {}
+            dataDict["stops"] = stops
+            dataDict["user"] = user.__dict__
+            response = render(request, "student.html", dataDict)
         response.set_cookie(key="jwt", value=token, httponly=True)
         return response
 
@@ -75,4 +79,8 @@ class landingPageAPI(APIView):
         if userObj.isAdmin:
             return render(request, "Admin.html")
         else:
-            return render(request, "Student.html")
+            stops = busStops.objects.values_list("name", flat=True)
+            dataDict = {}
+            dataDict["stops"] = stops
+            dataDict["user"] = userObj.__dict__
+            return render(request, "Student.html", dataDict)

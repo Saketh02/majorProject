@@ -57,7 +57,7 @@ class addStopsPageAPI(APIView):
 class addStopsAPI(APIView):
     @method_decorator(authorizationMiddleware)
     def post(self, request):
-        """data = request.data
+        data = request.data
         # one key is bus name itself
         dataLength = len(data) - 1
         # There are 3 attributes for every stop
@@ -78,6 +78,6 @@ class addStopsAPI(APIView):
                 continue
             stopObj = busStops.objects.create(name=stop, fee=fee)
             stopObj.bus.add(busObj)
-            busTimings.objects.create(bus=busObj, time=time, stop=stopObj)"""
-        messages.success(request, "Details were succesfully saved")
+            busTimings.objects.create(bus=busObj, time=time, stop=stopObj)
+            messages.success(request, "Details were succesfully saved")
         return redirect("add-stops-page")

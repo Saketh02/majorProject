@@ -6,4 +6,5 @@ urlpatterns = [
     path("login", views.LoginAPI.as_view(), name="login"),
     path("test", views.testLogin.as_view(), name="test"),
     path("landing-page", views.landingPageAPI.as_view(), name="landing-page"),
+    
 ]

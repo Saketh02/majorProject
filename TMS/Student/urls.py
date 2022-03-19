@@ -1,6 +1,8 @@
 from django.urls import path
-from User import views
+from User.views import logoutAPI
+from .views import TransportRequestAPI
 
 urlpatterns = [
-    path("logout", views.logoutAPI.as_view(), name="logout"),
+    path("logout", logoutAPI.as_view(), name="logout"),
+    path("trans-request", TransportRequestAPI.as_view(), name="trans-request"),
 ]

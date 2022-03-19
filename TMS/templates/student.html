@@ -54,7 +54,7 @@
                             <li class="scroll-to-section"><a href="#about">My Profile</a></li>
                             <li class="scroll-to-section"><a href="#projects">View Bus-Pass</a></li>
                             <li class="submenu">
-                                <a href="javascript:;">Fee Payment</a>
+                                <a href="">Fee Payment</a>
                                 <ul>
                                     <li><a href="">Earlier Payments</a></li>
                                     <li><a href="">Due Information</a></li>
@@ -136,13 +136,13 @@
                     <div class="right-text-content">
                         <p>
                         <div class="Profile">
-                            <label>Name: </label><input type="text"><br /><br />
-                            <label>Roll Number:</label><input type="text"><br /><br />
-                            <label>Email:</label><input type="text"><br /><br />
-                            <label>Department:</label><input type="text"><br /><br />
-                            <label>Phone Number:</label><input type="text"><br /><br />
-                            <label>Bus Name:</label><input type="text"><br /><br />
-                            <label>Boarding Point:</label><input type="text"><br /><br />
+                            <label>Name: </label><input type="text" value="{{ user.name }}" readonly><br /><br />
+                            <label>Roll Number:</label><input type="text" value="{{ user.rollnum}}" readonly><br /><br />
+                            <label>Email:</label><input type="text" value="{{ user.email }}" readonly><br /><br />
+                            <label>Department:</label><input type="text" value="{{ user.department }}" readonly><br /><br />
+                            <label>Phone Number:</label><input type="text" value="{{ user.mobile }}" readonly><br /><br />
+                            <label>Bus Name:</label><input type="text" value="{{ user.busName }}" readonly><br /><br />
+                            <label>Boarding Point:</label><input type="text" value="{{ user.boardingPoint }}" readonly><br /><br />
                         </div>
                         </p>
                     </div>
@@ -182,7 +182,7 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-xs-12">
                     <div class="contact-form">
-                        <form id="contact" action="" method="get">
+                        <form id="contact" action="{% url 'trans-request' %}" method="POST">
 
                             <div class="col-md-6 col-sm-12">
                                 <center>
@@ -190,10 +190,10 @@
                                         <h2>Select your boarding point!</h2>
                                     </div>
                                     <fieldset>
-                                        <select name="item_id" width="250" STYLE="width: 250px;height: 40px;">
-                                            {% for entry in items %}
-                                            <option value="{{ entry.id }}">Your Boarding point1</option>
-
+                                        <select name="stopName" width="250" STYLE="width: 250px;height: 40px;" required>
+                                            <option value="">Your Boarding point</option>
+                                            {% for entry in stops %}
+                                                <option value="{{ entry }}">{{ entry }}</option>
                                             {% endfor %}
                                         </select>
                                     </fieldset>
@@ -206,7 +206,18 @@
                                         type="submit" id="form-submit" class="main-button-icon">Submit
                                         <i class="fa fa-arrow-right"></i></button>
                                 </fieldset>
-                                </fieldset>
+                                <br/>
+                                {% if messages  %}
+                                    <ul class="messages">
+                                        {% for message in messages %}
+                                        <center>
+                                            <div class="alert alert-success" style="height:auto;width:auto">
+                                                {{message}}
+                                            </div>
+                                        </center>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                                 </center>
                             </div>
 
@@ -262,24 +273,7 @@
     <!-- Global Init -->
     <script src="{% static 'assets/js/custom.js' %}"></script>
 
-    <script>
-
-        $(function () {
-            var selectedClass = "";
-            $("p").click(function () {
-                selectedClass = $(this).attr("data-rel");
-                $("#portfolio").fadeTo(50, 0.1);
-                $("#portfolio div").not("." + selectedClass).fadeOut();
-                setTimeout(function () {
-                    $("." + selectedClass).fadeIn();
-                    $("#portfolio").fadeTo(50, 1);
-                }, 500);
-
-            });
-        });
-
-    </script>
-
+    
 </body>
 
 </html>
