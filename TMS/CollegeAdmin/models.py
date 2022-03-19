@@ -33,7 +33,7 @@ class busStops(models.Model):
 class busTimings(models.Model):
     bus = models.ForeignKey(Bus, on_delete=CASCADE)
     stop = models.ForeignKey(busStops, on_delete=CASCADE)
-    time = models.DateTimeField()
+    time = models.TimeField()
 
     REQUIRED_FIELDS = ["time"]
 

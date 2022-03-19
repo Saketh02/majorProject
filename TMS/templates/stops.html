@@ -124,13 +124,15 @@
                                 
                                 <div class="col-md-6 col-sm-12" id="">
                                     <fieldset>
-                                        <select name="item_id" width="" STYLE="width: 350px;height: 40px;">
+                                        <select name="busName" width="" STYLE="width: 350px;height: 40px;" required>
                                             <option value="" disabled selected>Select the Bus</option>
                                             {% for entry in busses %}
                                                 <option value="{{ entry }}">{{ entry }}</option>
                                             {% endfor %}
                                         </select>
                                     </fieldset>
+                                    <br/>
+                                    
                                     <div id="addtbs">
                                     </div>
                                 </div>
@@ -146,6 +148,20 @@
                                                 <i class="fa fa-arrow-right"></i></button>
                                     </fieldset>
                                 </div>
+                            <br/>
+                            <br/>
+                            <br/>
+                                {% if messages  %}
+                                        <ul class="messages">
+                                            {% for message in messages %}
+                                            <center>
+                                                <div class="alert alert-success" style="height:auto;width:auto">
+                                                    {{message}}
+                                                </div>
+                                            </center>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
                             </div>
                         </form>
                     </div>
@@ -223,18 +239,29 @@
         
         function addTextBoxes()
         {
-             var boxName="Stop "+countBox; 
-        document.getElementById('addtbs').innerHTML+='<br/><input type="text" id="'+boxName+'" placeholder="'+boxName+'" "  /><br/>';
-             countBox += 1;
-             var boxName="Fee "+countBox1; 
-        document.getElementById('addtbs').innerHTML+='<br/><input type="text" id="'+boxName+'" placeholder="'+boxName+'" "  /><br/>';
-             countBox1 += 1;
+            var boxName1 = "Stop "+countBox;
+            var boxName2 = "Fee "+countBox;
+            var boxName3 = "Time "+countBox;
+            element = document.getElementById("addtbs");
+            input1 = document.createElement('input');
+            input1.type = "text";
+            input1.name = boxName1;
+            input1.placeholder = boxName1;
+            element.appendChild(input1);
+            input2 = document.createElement('input');
+            input2.type = "text";
+            input2.name = boxName2;
+            input2.placeholder = boxName2;
+            element.appendChild(input2);
+            input3 = document.createElement('input');
+            input3.type = "time";
+            input3.name = boxName3;
+            input3.placeholder = boxName3;
+            element.appendChild(input3);
+            countBox += 1;
         }
 
     </script>
-    <script>
-        
-        </script>
 
 </body>
 

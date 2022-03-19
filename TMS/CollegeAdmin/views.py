@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 from .serializers import addBusDetailsSerializer
 from django.db.models import Q
-from .models import Bus
+from .models import Bus, busStops, busTimings
 
 # Create your views here.
 
@@ -57,6 +57,27 @@ class addStopsPageAPI(APIView):
 class addStopsAPI(APIView):
     @method_decorator(authorizationMiddleware)
     def post(self, request):
-        data = request.data
-        print(data)
-        return HttpResponse("Done")
+        """data = request.data
+        # one key is bus name itself
+        dataLength = len(data) - 1
+        # There are 3 attributes for every stop
+        dataLength = dataLength // 3
+        if "busName" not in data:
+            return HttpResponse("Bus Name Can't be found")
+        busName = data["busName"]
+        if not busName:
+            messages.error(request,"Bus Name Can't be found")
+        busObj = Bus.objects.filter(name=busName).first()
+        for i in range(1, dataLength + 1):
+            j = str(i)
+            try:
+                fee = int(data["Fee " + j])
+                stop = data["Stop " + j]
+                time = data["Time " + j]
+            except KeyError:
+                continue
+            stopObj = busStops.objects.create(name=stop, fee=fee)
+            stopObj.bus.add(busObj)
+            busTimings.objects.create(bus=busObj, time=time, stop=stopObj)"""
+        messages.success(request, "Details were succesfully saved")
+        return redirect("add-stops-page")
