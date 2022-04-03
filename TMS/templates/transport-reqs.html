@@ -1,0 +1,274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700,800,900&display=swap"
+        rel="stylesheet">
+
+    <title>Transport Requests</title>
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.min.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+
+    <link rel="stylesheet" href="{% static 'assets/css/templatemo-breezed.css' %}">
+
+    <link rel="stylesheet" href="{% static 'assets/css/owl-carousel.css' %}">
+
+    <link rel="stylesheet" href="{% static 'assets/css/lightbox.css' %}">
+
+    <style>
+        #customers {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #customers td,
+        #customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #customers tr:nth-child {
+            background-color: #f2f2f2;
+        }
+
+        #customers tr:hover {
+            background-color: #ddd;
+        }
+
+        #customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #41a17ec9;
+            color: white;
+        }
+
+        #btn1,
+        #btn2 {
+            border: 2px #41a17ec9;
+            border-radius: 15px;
+            font-weight: bold;
+            padding: 8px;
+            padding-left: 10px;
+            padding-right: 10px;
+            background-color: #41a17ec9;
+            color: white;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <!-- ***** Preloader End ***** -->
+
+
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <!-- ***** Logo Start ***** -->
+                        <a href="..\Bus\bus.html" class="logo">
+                            Transport Requests
+                        </a>
+                        <!-- ***** Logo End ***** -->
+                        <!-- ***** Menu Start ***** -->
+                        <ul class="nav">
+                            <li class=""><a href="{% url 'landing-page' %}">Home</a></li>
+
+                            <li class=""><a href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
+                        <a class='menu-trigger'>
+                            <span>Menu</span>
+                        </a>
+                        <!-- ***** Menu End ***** -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+    <!-- ***** Search Area ***** -->
+
+
+
+
+    <!-- // Item -->
+    <!-- Item -->
+
+    <!-- // Item -->
+
+
+    <!-- ***** Features Big Item Start ***** -->
+
+    <!-- ***** Features Big Item End ***** -->
+
+
+    <!-- ***** Projects Area Starts ***** -->
+
+    <!-- ***** Testimonials Ends ***** -->
+
+    <!-- ***** Contact Us Area Starts ***** -->
+    <section class="section" id="contact-us">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-xs-12">
+                    <div class="left-text-content">
+                        <div class="section-heading">
+                            <h2>Accept a Transport Request</h2>
+                        </div>
+                        <ul class="contact-info">
+
+
+                            <li><img src="{% static 'assets/images/contact-info-03.png' %}"
+                                    alt="">https://www.bvrit.ac.in/</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 col-xs-12">
+
+                    <form id="contact" action="{% url 'submit-trans-reqs' %}" method="POST" onsubmit="return validate(this);">
+                        <table id="customers">
+                            <tr>
+                                <th>Select</th>
+                                <th>Name</th>
+                                <th>Roll Number</th>
+                                <th>Year</th>
+                                <th>Department</th>
+                                <th>Stop</th>
+                                <th>Bus</th>
+                            </tr>
+                            {%for student in items%}
+                            <tr>
+                                <td>
+                                    <center><input id="checkbox+{{forloop.counter}}" type="checkbox" onclick="checkBoxChange(this.id)"/></center>
+                                </td>
+                                <td>{{student.0}}</td>
+                                <td>{{student.1}}</td>
+                                <td>{{student.2}}</td>
+                                <td>{{student.3}}</td>
+                                <td>{{student.4}}</td>
+                                
+
+                                <td>
+                                    <select id="dropdown+{{forloop.counter}}" onchange="dropDownChange(this.id)">
+                                        <option value="">select bus</option>
+                                    {%for bus in student.5%}
+                                        <option value={{bus.name}}>{{bus.name}}</option>
+                                    {%endfor%}
+                                    </select>
+                                    
+                                </td>
+                                <input type="hidden" name="checkboxh" id="checkboxh+{{forloop.counter}}" value="False">
+                                <input type="hidden" name="rollNumh" id="rollNumh" value={{student.1}}>
+                                <input type="hidden" name="busNameh" id="busNameh+{{forloop.counter}}" >
+
+                            </tr>
+                        {% endfor %}
+                        </table>
+                        <br>
+                        <center>
+                            <input id="btn1" name="btn1" type="submit" value="Submit"> &nbsp;&nbsp;
+                            <input id="btn2" name="btn2" type="submit" value="Remove Selected">
+                        </center>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Contact Us Area Ends ***** -->
+
+    <!-- ***** Footer Start ***** -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-xs-12">
+                    <div class="left-text-content">
+                    </div>
+                </div>
+                <div class="col-lg-6 col-xs-12">
+                    <div class="right-text-content">
+                        <ul class="social-icons">
+                            <li>
+                                <p>Follow Us</p>
+                            </li>
+                            <li><a rel="nofollow" href="https://www.facebook.com/BVRIT"><i
+                                        class="fa fa-facebook"></i></a></li>
+                            <li><a rel="nofollow"
+                                    href="https://www.linkedin.com/school/bv-raju-institute-of-technology-bvrit-/"><i
+                                        class="fa fa-linkedin"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="{% static 'assets/js/jquery-2.1.0.min.js' %}"></script>
+
+    <!-- Bootstrap -->
+    <script src="{% static 'assets/js/popper.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+
+    <!-- Plugins -->
+    <script src="{% static 'assets/js/owl-carousel.js' %}"></script>
+    <script src="{% static 'assets/js/scrollreveal.min.js' %}"></script>
+    <script src="{% static 'assets/js/waypoints.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'assets/js/imgfix.min.js' %}"></script>
+    <script src="{% static 'assets/js/slick.js' %}"></script>
+    <script src="{% static 'assets/js/lightbox.js' %}"></script>
+    <script src="{% static 'assets/js/isotope.js' %}"></script>
+    <!-- Global Init -->
+    <script src="{% static 'assets/js/custom.js' %}"></script>
+
+    <script>
+        function validate(form){
+            return confirm("confirm");
+        }
+
+        function checkBoxChange(id){
+            let checkBox = document.getElementById(id);
+            let counter = id.slice(9);
+            let element = document.getElementById('checkboxh+'.concat(counter));
+            if(checkBox.checked == true){
+               element.value="True"; 
+            }
+        }
+
+        function dropDownChange(id){
+            let dropDown = document.getElementById(id);
+            let counter = id.slice(9);
+            let element = document.getElementById('busNameh+'.concat(counter));
+            element.value = dropDown.value;
+        }
+    </script>
+
+</body>
+
+</html>

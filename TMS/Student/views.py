@@ -14,10 +14,15 @@ class TransportRequestAPI(APIView):
         userObj = request.user
         data = request.data
         result = busRequest.objects.filter(student=userObj).first()
-        if result:
+        if result and result.approvedStatus:
             messages.error(
                 request,
-                "There is an existing Transport request, Please wait for the approval",
+                "Your Transport Request was approved earlier please reach out to the administrator",
+            )
+        elif result and not result.approvedStatus:
+            messages.error(
+                request,
+                "You have already submitted a request earlier, please wait for the admin to accept it",
             )
         else:
             if not "stopName" in data:
@@ -26,7 +31,6 @@ class TransportRequestAPI(APIView):
             if stopName == "":
                 return
             stopObj = busStops.objects.filter(name=stopName).first()
-            print(stopObj)
             busRequest.objects.create(student=userObj, stop=stopObj)
             messages.success(request, "Your Transport Request has been submitted")
         return redirect("landing-page")

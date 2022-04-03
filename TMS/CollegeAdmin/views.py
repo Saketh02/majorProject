@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from logging.config import stopListening
+from wsgiref.util import request_uri
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
 from django.http import HttpResponse, HttpResponseRedirect
@@ -6,7 +9,8 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 from .serializers import addBusDetailsSerializer
 from django.db.models import Q
-from .models import Bus, busStops, busTimings
+from .models import Bus, busStops, busTimings, busRequest
+from User.models import Register
 
 # Create your views here.
 
@@ -66,7 +70,7 @@ class addStopsAPI(APIView):
             return HttpResponse("Bus Name Can't be found")
         busName = data["busName"]
         if not busName:
-            messages.error(request,"Bus Name Can't be found")
+            messages.error(request, "Bus Name Can't be found")
         busObj = Bus.objects.filter(name=busName).first()
         for i in range(1, dataLength + 1):
             j = str(i)
@@ -76,8 +80,45 @@ class addStopsAPI(APIView):
                 time = data["Time " + j]
             except KeyError:
                 continue
-            stopObj = busStops.objects.create(name=stop, fee=fee)
+            stopObj = busStops.objects.filter(name=stop).first()
+            if not stopObj:
+                stopObj = busStops.objects.create(name=stop, fee=fee)
             stopObj.bus.add(busObj)
             busTimings.objects.create(bus=busObj, time=time, stop=stopObj)
             messages.success(request, "Details were succesfully saved")
         return redirect("add-stops-page")
+
+
+class getTransportReqsAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def get(self, request):
+        data = []
+        busRequests = busRequest.objects.all()
+        c = 1
+        if not busRequests:
+            messages.error(request, "No Transport Request found")
+        for requestObj in busRequests:
+            studentObj = requestObj.student
+            name = studentObj.name
+            rollnum = studentObj.rollnum
+            year = studentObj.year
+            department = studentObj.department
+            stopName = requestObj.stop.name
+            busses = busStops.objects.filter(name=stopName).first().bus.all()
+            dataTuple = (name, rollnum, year, department, stopName, busses)
+            data.append(dataTuple)
+            c += 1
+        d={}
+        d["items"]=data
+        return render(request, "transport-reqs.html", d)
+
+class acceptOrRejectTransportRequestsAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def post(self, request):
+        if "btn1" in request.POST:
+            return HttpResponse("btn1")
+        elif "btn2" in request.POST:
+            print(request.data)
+            return HttpResponse("btn2")
+        else:
+            return HttpResponse("Invalid Request")    
