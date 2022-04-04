@@ -35,7 +35,7 @@ class LoginAPI(APIView):
         if user is None:
             return HttpResponse("Invalid Credentials")
         if not user.check_password(password):
-            raise HttpResponse("Email ID or Password is Incorrect")
+            return HttpResponse("Email ID or Password is Incorrect")
         payload = {
             "id": user.id,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60),

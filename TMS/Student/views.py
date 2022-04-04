@@ -17,7 +17,7 @@ class TransportRequestAPI(APIView):
         if result and result.approvedStatus:
             messages.error(
                 request,
-                "Your Transport Request was approved earlier please reach out to the administrator",
+                "Your Transport Request was approved earlier please pay the fee if you haven't",
             )
         elif result and not result.approvedStatus:
             messages.error(

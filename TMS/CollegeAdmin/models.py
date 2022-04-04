@@ -48,6 +48,6 @@ class busAllotmentData(models.Model):
     student = models.ForeignKey(Register, on_delete=CASCADE)
     bus = models.ForeignKey(Bus, on_delete=CASCADE)
     boardingPoint = models.ForeignKey(busStops, on_delete=CASCADE)
-    seatNumber = models.IntegerField()
-    paidAmount = models.IntegerField()
+    seatNumber = models.IntegerField(null=False)
+    paidAmount = models.IntegerField(default=0)
     paymentStatus = models.BooleanField(default=False)

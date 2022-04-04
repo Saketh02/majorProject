@@ -147,8 +147,9 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-xs-12">
-
+                    {% if items %}
                     <form id="contact" action="{% url 'submit-trans-reqs' %}" method="POST" onsubmit="return validate(this);">
+                    
                         <table id="customers">
                             <tr>
                                 <th>Select</th>
@@ -180,20 +181,45 @@
                                     </select>
                                     
                                 </td>
-                                <input type="hidden" name="checkboxh" id="checkboxh+{{forloop.counter}}" value="False">
-                                <input type="hidden" name="rollNumh" id="rollNumh" value={{student.1}}>
-                                <input type="hidden" name="busNameh" id="busNameh+{{forloop.counter}}" >
-
+                                    <input type="hidden" name="checkboxh" id="checkboxh+{{forloop.counter}}" value="False">
+                                    <input type="hidden" name="rollNumh" id="rollNumh" value={{student.1}}>
+                                    <input type="hidden" name="busNameh" id="busNameh+{{forloop.counter}}" >
                             </tr>
-                        {% endfor %}
+                            {% endfor %}
                         </table>
                         <br>
                         <center>
                             <input id="btn1" name="btn1" type="submit" value="Submit"> &nbsp;&nbsp;
                             <input id="btn2" name="btn2" type="submit" value="Remove Selected">
                         </center>
+                        <br>
+                        {% if messages  %}
+                            <ul class="messages">
+                                {% for message in messages %}
+                                <center>
+                                    <div class="alert alert-success" style="height:auto;width:auto">
+                                        {{message}}
+                                    </div>
+                                </center>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
 
                     </form>
+                {% else %}
+                    {% if messages  %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <center>
+                                <div class="alert alert-success" style="height:auto;width:auto">
+                                    {{message}}
+                                </div>
+                            </center>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+                
 
                 </div>
             </div>

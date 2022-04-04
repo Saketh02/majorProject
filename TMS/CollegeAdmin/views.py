@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from logging.config import stopListening
+from tabnanny import check
 from wsgiref.util import request_uri
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
@@ -9,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 from .serializers import addBusDetailsSerializer
 from django.db.models import Q
-from .models import Bus, busStops, busTimings, busRequest
+from .models import Bus, busStops, busTimings, busRequest, busAllotmentData
 from User.models import Register
 
 # Create your views here.
@@ -93,7 +94,8 @@ class getTransportReqsAPI(APIView):
     @method_decorator(authorizationMiddleware)
     def get(self, request):
         data = []
-        busRequests = busRequest.objects.all()
+        busRequests = busRequest.objects.filter(approvedStatus=False)
+        print(busRequests)
         c = 1
         if not busRequests:
             messages.error(request, "No Transport Request found")
@@ -108,17 +110,68 @@ class getTransportReqsAPI(APIView):
             dataTuple = (name, rollnum, year, department, stopName, busses)
             data.append(dataTuple)
             c += 1
-        d={}
-        d["items"]=data
+        d = {}
+        d["items"] = data
         return render(request, "transport-reqs.html", d)
+
 
 class acceptOrRejectTransportRequestsAPI(APIView):
     @method_decorator(authorizationMiddleware)
     def post(self, request):
+        data = request.data
+        checkBoxes = data.getlist("checkboxh")
+        rollNums = data.getlist("rollNumh")
+        busNames = data.getlist("busNameh")
         if "btn1" in request.POST:
-            return HttpResponse("btn1")
+            if not rollNums or not busNames:
+                return HttpResponse("Invalid Request", status=404)
+            rows = len(rollNums)
+            filledBusses = []
+            for i in range(rows):
+                if busNames[i] != "":
+                    busObj = Bus.objects.filter(name=busNames[i]).first()
+                    count = busAllotmentData.objects.filter(bus=busObj).count()
+                    if count == busObj.seats:
+                        filledBusses.append(busNames[i])
+                        continue
+                    else:
+                        seatNum = count + 1
+                    studentObj = Register.objects.filter(rollnum=rollNums[i]).first()
+                    busReqObj = busRequest.objects.filter(student=studentObj).first()
+                    stopObj = busReqObj.stop
+                    busReqObj.approvedStatus = True
+                    busReqObj.save()
+                    busAllotmentData.objects.create(
+                        student=studentObj,
+                        bus=busObj,
+                        boardingPoint=stopObj,
+                        seatNumber=seatNum,
+                    )
+                else:
+                    continue
+            if filledBusses:
+                messages.success(
+                    request,
+                    "The busses {} are filled and remaining students have been alloted".format(
+                        filledBusses
+                    ),
+                )
+            else:
+                messages.success(
+                    request, "The choosen Transport Requests have been approved"
+                )
+            return redirect("Transport-Reqs")
         elif "btn2" in request.POST:
-            print(request.data)
-            return HttpResponse("btn2")
+            if not checkBoxes:
+                return HttpResponse("Invalid Request", status=404)
+            rows = len(checkBoxes)
+            for i in range(rows):
+                if checkBoxes[i] == "True":
+                    rollNum = int(rollNums[i])
+                    userObj = Register.objects.filter(rollnum=rollNum).first()
+                    transReqObj = busRequest.objects.filter(student=userObj)
+                    transReqObj.delete()
+            messages.success(request, "Selected Students have been removed")
+            return redirect("Transport-Reqs")
         else:
-            return HttpResponse("Invalid Request")    
+            return HttpResponse("Invalid Request")
