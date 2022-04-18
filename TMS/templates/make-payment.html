@@ -146,6 +146,7 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-xs-12">
+                    <form action="{% url 'payment-capture' %}" method="POST">
                         <center>
                             <input type="text" value={{amount}} readonly><br>
                             <br>
@@ -153,11 +154,13 @@
                             <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                             <script>
                             var options = {
-                                "key": "rzp_live_sbm1pLwisy39QL", // Enter the Key ID generated from the Dashboard
+                                "key": "{{razorpay_key_id}}", // Enter the Key ID generated from the Dashboard
                                 "amount": "{{amount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                                 "currency": "INR",
-                                "name": "Acme Corp",
-                                "description": "Test Transaction",
+                                "name": "BVRIT Transport Fee",
+                                "description": "Powered by Razorpay",
+                                "callback_url": 'https://ccec-49-204-189-220.in.ngrok.io/student/payment-capture',
+                                redirect: true,
                                 "image": "https://example.com/your_logo",
                                 "order_id": "{{order_id}}",
                                 "handler": function (response){
@@ -166,12 +169,12 @@
                                     alert(response.razorpay_signature)
                                 },
                                 "prefill": {
-                                    "name": "Gaurav Kumar",
-                                    "email": "gaurav.kumar@example.com",
-                                    "contact": "9999999999"
+                                    "name": "Rahul",
+                                    "email": "rahulk@gmail.com",
+                                    "contact": "8555996942"
                                 },
                                 "notes": {
-                                    "address": "Razorpay Corporate Office"
+                                    "address": "BVRIT-Narsapur"
                                 },
                                 "theme": {
                                     "color": "#3399cc"

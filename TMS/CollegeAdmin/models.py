@@ -1,3 +1,5 @@
+from distutils.archive_util import make_zipfile
+from statistics import mode
 from django.db import models
 from django.db.models.deletion import CASCADE
 from User.models import Register
@@ -51,3 +53,10 @@ class busAllotmentData(models.Model):
     seatNumber = models.IntegerField(null=False)
     paidAmount = models.IntegerField(default=0)
     paymentStatus = models.BooleanField(default=False)
+
+
+class payment(models.Model):
+    student = models.ForeignKey(Register, on_delete=CASCADE)
+    orderId = models.CharField(max_length=150, unique=True, null=True)
+    paymentId = models.CharField(max_length=150, unique=True, null=True)
+    signature = models.CharField(max_length=200, unique=True, null=True)
