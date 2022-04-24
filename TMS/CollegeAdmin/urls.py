@@ -16,4 +16,6 @@ urlpatterns = [
     path("busses-info", views.bussesInfoAPI.as_view(), name="busses-info"),
     path("busses-list", views.bussesListAPI.as_view(), name="busses-list"),
     path("students-info", views.studentsInfoAPI.as_view(), name="students-info"),
+    path("busses-list2", views.bussesListAPI2.as_view(), name="busses-list2"),
+    path("stops-info", views.stopsInfoAPI.as_view(), name="stops-info"),
 ]

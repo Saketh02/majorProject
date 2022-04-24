@@ -91,7 +91,6 @@ class getTransportReqsAPI(APIView):
     def get(self, request):
         data = []
         busRequests = busRequest.objects.filter(approvedStatus=False)
-        print(busRequests)
         c = 1
         if not busRequests:
             messages.error(request, "No Transport Request found")
@@ -186,7 +185,6 @@ class bussesListAPI(APIView):
         busses = Bus.objects.values_list("name", flat=True)
         bussesDict = {}
         bussesDict["busses"] = busses
-        print(busses)
         return render(request, "students-info.html", bussesDict)
 
 
@@ -222,9 +220,42 @@ class studentsInfoAPI(APIView):
                     feePaid,
                     due,
                 ]
-            data.append(student)
+                data.append(student)
         if not data:
-            messages.error(request,"No Students are alloted to the selected bus")
+            messages.error(request, "No Students are alloted to the selected bus")
         return render(
             request, "students-info.html", {"items": data, "busses": busNames}
         )
+
+
+class bussesListAPI2(APIView):
+    @method_decorator(authorizationMiddleware)
+    def get(self, request):
+        busses = Bus.objects.values_list("name", flat=True)
+        bussesDict = {}
+        bussesDict["busses"] = busses
+        return render(request, "stops-info.html", bussesDict)
+
+
+class stopsInfoAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def post(self, request):
+        busNames = Bus.objects.values_list("name", flat=True)
+        if "busName" not in request.data:
+            return HttpResponse("Invalid Request", status=404)
+        busName = request.data["busName"]
+        busses = Bus.objects.filter(name=busName)
+        if not busses:
+            return HttpResponse("Invalid Request", status=404)
+        busObj = busses.first()
+        querySet = busTimings.objects.filter(bus=busObj).order_by("time")
+        data = []
+        if querySet:
+            for i in querySet:
+                stopName = i.stop.name
+                time = i.time
+                student = [stopName, time]
+                data.append(student)
+        if not data:
+            messages.error(request, "Stops are not yet added to the selected bus")
+        return render(request, "stops-info.html", {"items": data, "busses": busNames})
