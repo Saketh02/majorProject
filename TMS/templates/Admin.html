@@ -56,12 +56,13 @@
                             <li class="submenu">
                                 <a href="javascript:;">Search</a>
                                 <ul>
-                                    <!-- ***** Search All the Students in a bus ***** -->
-                                    <li><a href="">Bus Info</a></li>
-                                    <!-- ***** Get Entire Details of a student ***** -->
-                                    <li><a href="">Student Info</a></li>
-                                    <!-- ***** Get Entire details of all busses + Vacant ***** -->
+                                    <!-- ***** Search All the Students in a bus using the bus name ***** -->
+                                    <li><a href="{% url 'busses-list' %}">Students Info</a></li>
+                                    <!-- ***** Get details of all the busses, with their driver Info ***** -->
+                                    <li><a href="{% url 'busses-info' %}">Busses Info</a></li>
+                                    <!-- ***** Get details of all the stops, timings and fees corresponding to the bus ***** -->
                                     <li><a href="">Transport Info</a></li>
+
 
                                 </ul>
                             </li>

@@ -1,12 +1,17 @@
+import imp
+from math import exp
 from msilib.schema import ReserveCost
+import django
 from django.shortcuts import redirect, render
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
+from django.contrib.auth import logout
 
 import jwt, datetime
 from .serializers import RegisterSerializer
+
 from rest_framework.response import Response
 from django.http import HttpResponse
 from .models import Register
@@ -67,9 +72,9 @@ class testLogin(APIView):
 class logoutAPI(APIView):
     @method_decorator(authorizationMiddleware)
     def get(self, request):
-        response = Response()
-        response.delete_cookie("jwt")
-        return redirect("/")
+        response = redirect('/')
+        response.delete_cookie('jwt')
+        return response
 
 
 class landingPageAPI(APIView):

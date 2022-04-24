@@ -113,26 +113,40 @@ class paymentCaptureAPI(APIView):
         signature = request.POST["razorpay_signature"]
         if not orderId or not paymentId or not signature:
             return HttpResponse("Invalid Content")
-        paymentObj = payment.objects.filter(orderId=orderId).first()
-        paymentObj.paymentId = paymentId
-        paymentObj.signature = signature
-        paymentObj.save()
-        payload = client.payment.fetch(paymentId)
-        if "status" not in payload:
+        try:
+            status = client.utility.verify_payment_signature(
+                {
+                    "razorpay_order_id": orderId,
+                    "razorpay_payment_id": paymentId,
+                    "razorpay_signature": signature,
+                }
+            )
+        except:
             return HttpResponse("Invalid Request")
-        if payload["status"] == "captured":
-            amount = payload["amount"]/100
-            allotmentObj = busAllotmentData.objects.filter(student=paymentObj.student).first()
-            allotmentObj.paidAmount += amount
-            print(allotmentObj.student)
-            busRequestObj = busRequest.objects.filter(student=allotmentObj.student).first()
-            stopObj = busRequestObj.stop
-            if allotmentObj.paidAmount >= stopObj.fee:
-                allotmentObj.paymentStatus = True
-                allotmentObj.save()
-            return render(request,"sample.html",{"event":True})
-        return render(request,"sample.html",{"event":False})
-        
+        if status:
+            paymentObj = payment.objects.filter(orderId=orderId).first()
+            paymentObj.paymentId = paymentId
+            paymentObj.signature = signature
+            paymentObj.save()
+            payload = client.payment.fetch(paymentId)
+            if "status" not in payload:
+                return HttpResponse("Invalid Request")
+            if payload["status"] == "captured":
+                amount = payload["amount"] / 100
+                allotmentObj = busAllotmentData.objects.filter(
+                    student=paymentObj.student
+                ).first()
+                allotmentObj.paidAmount += amount
+
+                busRequestObj = busRequest.objects.filter(
+                    student=allotmentObj.student
+                ).first()
+                stopObj = busRequestObj.stop
+                if allotmentObj.paidAmount >= stopObj.fee:
+                    allotmentObj.paymentStatus = True
+                    allotmentObj.save()
+                return render(request, "sample.html", {"event": True})
+            return render(request, "sample.html", {"event": False})
 
 
 class webhookAPI(APIView):
@@ -140,13 +154,15 @@ class webhookAPI(APIView):
         if "X-Razorpay-Signature" not in request.headers:
             return HttpResponse("Invalid Request")
         signature = request.headers["X-Razorpay-Signature"]
-        webhookBody = str(request.body,'utf-8')
-        status = client.utility.verify_webhook_signature(webhookBody, signature, WEBHOOK_SECRET)
+        webhookBody = str(request.body, "utf-8")
+        status = client.utility.verify_webhook_signature(
+            webhookBody, signature, WEBHOOK_SECRET
+        )
         if status:
             try:
                 payload = request.data["payload"]["payment"]["entity"]
-                if payload["status"] == 'captured':
+                if payload["status"] == "captured":
                     orderId = payload["order_id"]
             except KeyError:
                 return HttpResponse("Invalid Request")
-        return render(request,"sample.html",{"event":True})
+        return render(request, "sample.html", {"event": True})

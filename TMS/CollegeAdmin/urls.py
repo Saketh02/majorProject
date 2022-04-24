@@ -13,4 +13,7 @@ urlpatterns = [
         views.acceptOrRejectTransportRequestsAPI.as_view(),
         name="submit-trans-reqs",
     ),
+    path("busses-info", views.bussesInfoAPI.as_view(), name="busses-info"),
+    path("busses-list", views.bussesListAPI.as_view(), name="busses-list"),
+    path("students-info", views.studentsInfoAPI.as_view(), name="students-info"),
 ]

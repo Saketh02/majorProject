@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700,800,900&display=swap"
         rel="stylesheet">
 
-    <title>Pay Transport Fee</title>
+    <title>Students Info</title>
 
     <!-- Additional CSS Files -->
     <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.min.css' %}">
@@ -88,7 +88,7 @@
                     <nav class="main-nav">
                         <!-- ***** Logo Start ***** -->
                         <a href="" class="logo">
-                            Fee Payment
+                            Students Information
                         </a>
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->
@@ -135,7 +135,7 @@
                 <div class="col-lg-4 col-md-4 col-xs-12">
                     <div class="left-text-content">
                         <div class="section-heading">
-                            <h2>Pay the Transport Fee</h2>
+                            <h2>View Students</h2>
                         </div>
                         <ul class="contact-info">
 
@@ -146,56 +146,76 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-xs-12">
-                    <form action="{% url 'payment-capture' %}" method="POST">
-                        <center>
-                            <input type="text" value={{amount}} readonly><br>
-                            <br>
-                            <button id="rzp-button1">Pay</button>
-                            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-                            <script>
-                            var options = {
-                                "key": "{{razorpay_key_id}}", // Enter the Key ID generated from the Dashboard
-                                "amount": "{{amount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-                                "currency": "INR",
-                                "name": "BVRIT Transport Fee",
-                                "description": "Powered by Razorpay",
-                                "callback_url": 'http://127.0.0.1:8000/student/payment-capture',
-                                redirect: true,
-                                "image": "https://example.com/your_logo",
-                                "order_id": "{{order_id}}",
-                                "handler": function (response){
-                                    alert(response.razorpay_payment_id);
-                                    alert(response.razorpay_order_id);
-                                    alert(response.razorpay_signature)
-                                },
-                                "prefill": {
-                                    "name": "Rahul",
-                                    "email": "rahulk@gmail.com",
-                                    "contact": "8555996942"
-                                },
-                                "notes": {
-                                    "address": "BVRIT-Narsapur"
-                                },
-                                "theme": {
-                                    "color": "#3399cc"
-                                }
-                            };
-                            var rzp1 = new Razorpay(options);
-                            rzp1.on('payment.failed', function (response){
-                                    alert(response.error.code);
-                                    alert(response.error.description);
-                                    alert(response.error.source);
-                                    alert(response.error.step);
-                                    alert(response.error.reason);
-                                    alert(response.error.metadata.order_id);
-                                    alert(response.error.metadata.payment_id);
-                            });
-                            document.getElementById('rzp-button1').onclick = function(e){
-                                rzp1.open();
-                                e.preventDefault();
-                            }
-                            </script>
-                        </center>
+
+                    <form id="contact" action="{% url 'students-info' %}" method="POST">
+
+
+                        <h2 class="section-heading"><strong></strong></h2>
+
+                        <select name="busName" width="250" STYLE="width: 250px;height: 40px;">
+                            <option value="">Select the Bus</option>
+                            {% for entry in busses %}
+                            <option value="{{ entry}}">{{entry}}</option>
+                            {% endfor %}
+                        </select>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input id="btn1" type="submit" value="Submit">
+
+
+                    </form>
+                    <br>
+                    <br>
+                    {% if items %}
+                        <table id="customers">
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll Number</th>
+                                <th>Year</th>
+                                <th>Department</th>
+                                <th>Stop</th>
+                                <th>Bus</th>
+                                <th>Fee Paid</th>
+                                <th>Due</th>
+
+                            </tr>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{item.0}}</td>
+                                <td>{{item.1}}</td>
+                                <td>{{item.2}}</td>
+                                <td>{{item.3}}</td>
+                                <td>{{item.4}}</td>
+                                <td>{{item.5}}</td>
+                                <td>{{item.6}}</td>
+                                <td>{{item.7}}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        {% if messages  %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <center>
+                                <div class="alert alert-success" style="height:auto;width:auto">
+                                    {{message}}
+                                </div>
+                            </center>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                            <ul class="messages">
+                                <center>
+                                    <div class="alert alert-success" style="height:auto;width:auto">
+                                        Please Select a bus to view all the Allotments
+                                    </div>
+                                </center>
+    
+                        </ul>
+
+                        {% endif %}
+                    <br>
+                    {% endif %}
+
 
 
                 </div>
@@ -231,6 +251,7 @@
     </footer>
 
 
+    <!-- jQuery -->
     <script src="{% static 'assets/js/jquery-2.1.0.min.js' %}"></script>
 
     <!-- Bootstrap -->
@@ -246,6 +267,7 @@
     <script src="{% static 'assets/js/slick.js' %}"></script>
     <script src="{% static 'assets/js/lightbox.js' %}"></script>
     <script src="{% static 'assets/js/isotope.js' %}"></script>
+
     <!-- Global Init -->
     <script src="{% static 'assets/js/custom.js' %}"></script>
 

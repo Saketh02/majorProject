@@ -1,10 +1,6 @@
-from dataclasses import dataclass
-from logging.config import stopListening
-from tabnanny import check
-from wsgiref.util import request_uri
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from TMS.middleware import authorizationMiddleware
 from django.utils.decorators import method_decorator
 from django.contrib import messages
@@ -175,3 +171,60 @@ class acceptOrRejectTransportRequestsAPI(APIView):
             return redirect("Transport-Reqs")
         else:
             return HttpResponse("Invalid Request")
+
+
+class bussesInfoAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def get(self, request):
+        querySet = Bus.objects.all()
+        return render(request, "busses-info.html", {"items": querySet})
+
+
+class bussesListAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def get(self, request):
+        busses = Bus.objects.values_list("name", flat=True)
+        bussesDict = {}
+        bussesDict["busses"] = busses
+        print(busses)
+        return render(request, "students-info.html", bussesDict)
+
+
+class studentsInfoAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def post(self, request):
+        busNames = Bus.objects.values_list("name", flat=True)
+        if "busName" not in request.data:
+            return HttpResponse("Invalid Request", status=404)
+        busName = request.data["busName"]
+        busses = Bus.objects.filter(name=busName)
+        if not busses:
+            return HttpResponse("Invalid Request", status=404)
+        busObj = busses.first()
+        querySet = busAllotmentData.objects.filter(bus=busObj)
+        data = []
+        if querySet:
+            for i in querySet:
+                name = i.student.name
+                rollNum = i.student.rollnum
+                year = i.student.year
+                dept = i.student.department
+                boardingPoint = i.boardingPoint.name
+                feePaid = i.paidAmount
+                due = busStops.objects.filter(name=boardingPoint).first().fee - feePaid
+                student = [
+                    name,
+                    rollNum,
+                    year,
+                    dept,
+                    boardingPoint,
+                    busName,
+                    feePaid,
+                    due,
+                ]
+            data.append(student)
+        if not data:
+            messages.error(request,"No Students are alloted to the selected bus")
+        return render(
+            request, "students-info.html", {"items": data, "busses": busNames}
+        )
