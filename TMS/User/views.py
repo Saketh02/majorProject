@@ -32,9 +32,10 @@ class RegisterAPI(APIView):
 
 class LoginAPI(APIView):
     def post(self, request):
+        if "email" not in request.data and "password" not in request.data:
+            return HttpResponse("Invalid Request",status=404)
         email = request.data["email"]
         password = request.data["password"]
-
         user = Register.objects.filter(email=email).first()
         if user is None:
             return HttpResponse("Invalid Credentials")
@@ -88,3 +89,5 @@ class landingPageAPI(APIView):
             dataDict["stops"] = stops
             dataDict["user"] = userObj.__dict__
             return render(request, "Student.html", dataDict)
+
+

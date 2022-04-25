@@ -153,6 +153,11 @@
                         <h2 class="section-heading"><strong></strong></h2>
 
                         <select name="busName" width="250" STYLE="width: 250px;height: 40px;">
+                            {% if currBus %}
+                                <option value="">{{currBus}}</option>
+                            {% else %}
+                                <option value="">Select the Bus</option>
+                            {% endif %}
                             <option value="">Select the Bus</option>
                             {% for entry in busses %}
                             <option value="{{ entry}}">{{entry}}</option>

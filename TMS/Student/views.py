@@ -1,5 +1,3 @@
-import imp
-import re
 from sre_constants import SUCCESS
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -9,7 +7,7 @@ from TMS.middleware import authorizationMiddleware
 from django.utils.decorators import method_decorator
 from django.contrib import messages
 import razorpay
-from CollegeAdmin.models import busAllotmentData, busStops, payment
+from CollegeAdmin.models import busAllotmentData, busStops, payment, busRequest
 from .constants import RAZORPAY_KEY_ID, RAZORPAY_SECRET, WEBHOOK_SECRET
 
 # Create your views here.
@@ -166,3 +164,24 @@ class webhookAPI(APIView):
             except KeyError:
                 return HttpResponse("Invalid Request")
         return render(request, "sample.html", {"event": True})
+
+
+class viewBusPassAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def post(self, request):
+        userObj = request.user
+        busRequestObjs = busRequest.objects.filter(student=userObj)
+        if busRequestObjs:
+            busRequestObj = busRequestObjs.first()
+            if not busRequestObj.approvedStatus:
+                messages.error(request, "Your Request is not approved yet")
+            else:
+                allotmentObj = busAllotmentData.objects.filter(student=userObj).first()
+                stopObj = allotmentObj.boardingPoint
+                fee = stopObj.fee
+                paidAmount = allotmentObj.paidAmount
+                if paidAmount >= (fee // 2):
+                    return render(request, "bus-pass.html", {"flag": True})
+        else:
+            messages.error(request, "Please submit a transport request and pay the fee")
+        return render(request, "bus-pass.html", {"flag": False})

@@ -224,7 +224,7 @@ class studentsInfoAPI(APIView):
         if not data:
             messages.error(request, "No Students are alloted to the selected bus")
         return render(
-            request, "students-info.html", {"items": data, "busses": busNames}
+            request, "students-info.html", {"items": data, "busses": busNames,"currBus":busObj.name}
         )
 
 
@@ -258,4 +258,8 @@ class stopsInfoAPI(APIView):
                 data.append(student)
         if not data:
             messages.error(request, "Stops are not yet added to the selected bus")
-        return render(request, "stops-info.html", {"items": data, "busses": busNames})
+        return render(
+            request,
+            "stops-info.html",
+            {"items": data, "busses": busNames, "currBus": busObj.name},
+        )

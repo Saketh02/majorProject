@@ -153,7 +153,11 @@
                         <h2 class="section-heading"><strong></strong></h2>
 
                         <select name="busName" width="250" STYLE="width: 250px;height: 40px;">
-                            <option value="">Select the Bus</option>
+                            {% if currBus %}
+                                <option value="">{{currBus}}</option>
+                            {% else %}
+                                <option value="">Select the Bus</option>
+                            {% endif %}
                             {% for entry in busses %}
                             <option value="{{ entry}}">{{entry}}</option>
                             {% endfor %}
@@ -168,26 +172,16 @@
                     {% if items %}
                         <table id="customers">
                             <tr>
-                                <th>Name</th>
-                                <th>Roll Number</th>
-                                <th>Year</th>
-                                <th>Department</th>
-                                <th>Stop</th>
-                                <th>Bus</th>
-                                <th>Fee Paid</th>
-                                <th>Due</th>
+                                <th>Stop Name</th>
+                                <th>Time</th>
+                                
 
                             </tr>
                             {% for item in items %}
                             <tr>
                                 <td>{{item.0}}</td>
                                 <td>{{item.1}}</td>
-                                <td>{{item.2}}</td>
-                                <td>{{item.3}}</td>
-                                <td>{{item.4}}</td>
-                                <td>{{item.5}}</td>
-                                <td>{{item.6}}</td>
-                                <td>{{item.7}}</td>
+                                
                             </tr>
                             {% endfor %}
                         </table>

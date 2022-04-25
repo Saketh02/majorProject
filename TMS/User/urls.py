@@ -8,3 +8,6 @@ urlpatterns = [
     path("landing-page", views.landingPageAPI.as_view(), name="landing-page"),
     
 ]
+
+
+action="{% url 'register' %}"
