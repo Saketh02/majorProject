@@ -10,6 +10,8 @@ from rest_framework.views import APIView
 from django.contrib.auth import logout
 
 import jwt, datetime
+
+
 from .serializers import RegisterSerializer
 
 from rest_framework.response import Response
@@ -17,7 +19,7 @@ from django.http import HttpResponse
 from .models import Register
 from TMS.middleware import authorizationMiddleware
 from django.utils.decorators import method_decorator
-from CollegeAdmin.models import busStops
+from CollegeAdmin.models import busStops, busAllotmentData
 
 # Create your views here.
 
@@ -33,7 +35,7 @@ class RegisterAPI(APIView):
 class LoginAPI(APIView):
     def post(self, request):
         if "email" not in request.data and "password" not in request.data:
-            return HttpResponse("Invalid Request",status=404)
+            return HttpResponse("Invalid Request", status=404)
         email = request.data["email"]
         password = request.data["password"]
         user = Register.objects.filter(email=email).first()
@@ -72,8 +74,8 @@ class testLogin(APIView):
 class logoutAPI(APIView):
     @method_decorator(authorizationMiddleware)
     def get(self, request):
-        response = redirect('/')
-        response.delete_cookie('jwt')
+        response = redirect("/")
+        response.delete_cookie("jwt")
         return response
 
 
@@ -88,6 +90,10 @@ class landingPageAPI(APIView):
             dataDict = {}
             dataDict["stops"] = stops
             dataDict["user"] = userObj.__dict__
+            allotmentData = busAllotmentData.objects.filter(student=userObj)
+            if allotmentData:
+                dataDict["user"][
+                    "boardingPoint"
+                ] = allotmentData.first().boardingPoint.name
+                dataDict["user"]["busName"] = allotmentData.first().bus.name
             return render(request, "Student.html", dataDict)
-
-

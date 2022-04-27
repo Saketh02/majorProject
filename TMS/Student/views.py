@@ -7,7 +7,13 @@ from TMS.middleware import authorizationMiddleware
 from django.utils.decorators import method_decorator
 from django.contrib import messages
 import razorpay
-from CollegeAdmin.models import busAllotmentData, busStops, payment, busRequest
+from CollegeAdmin.models import (
+    busAllotmentData,
+    busStops,
+    payment,
+    busRequest,
+    busTimings,
+)
 from .constants import RAZORPAY_KEY_ID, RAZORPAY_SECRET, WEBHOOK_SECRET
 
 # Create your views here.
@@ -135,7 +141,7 @@ class paymentCaptureAPI(APIView):
                     student=paymentObj.student
                 ).first()
                 allotmentObj.paidAmount += amount
-
+                allotmentObj.save()
                 busRequestObj = busRequest.objects.filter(
                     student=allotmentObj.student
                 ).first()
@@ -168,7 +174,7 @@ class webhookAPI(APIView):
 
 class viewBusPassAPI(APIView):
     @method_decorator(authorizationMiddleware)
-    def post(self, request):
+    def get(self, request):
         userObj = request.user
         busRequestObjs = busRequest.objects.filter(student=userObj)
         if busRequestObjs:
@@ -180,8 +186,16 @@ class viewBusPassAPI(APIView):
                 stopObj = allotmentObj.boardingPoint
                 fee = stopObj.fee
                 paidAmount = allotmentObj.paidAmount
+                print(paidAmount, fee)
                 if paidAmount >= (fee // 2):
-                    return render(request, "bus-pass.html", {"flag": True})
+                    data = {}
+                    data["student"] = userObj.name
+                    data["boardingPoint"] = stopObj.name
+                    data["busName"] = allotmentObj.bus.name
+                    data["seatNum"] = allotmentObj.seatNumber
+                    data["time"] = busTimings.objects.filter(stop=stopObj).first().time
+                    data["flag"] = True
+                    return render(request, "bus-pass.html", data)
         else:
             messages.error(request, "Please submit a transport request and pay the fee")
         return render(request, "bus-pass.html", {"flag": False})
