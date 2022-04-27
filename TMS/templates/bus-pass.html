@@ -104,11 +104,12 @@
   <ul class="messages">
       {% for message in messages %}
       <center>
-          <div class="alert alert-success">
-            <p style="border:black; background:powderblue; border-width:50%; position:relative; padding:15px; border-style:solid;">{{message}}</p>
-          </div>
+          <script>
+            alert('{{message}}');
+            window.location.replace("http://127.0.0.1:8000/user/landing-page");
+          </script>
       </center>
-      {% endfor %}
+    {% endfor %}
   </ul>
   {% endif %}
 {% endif %}

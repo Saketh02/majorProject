@@ -62,11 +62,23 @@
                                     <li><a href="{% url 'busses-info' %}">Busses Info</a></li>
                                     <!-- ***** Get details of all the stops, timings and fees corresponding to the bus ***** -->
                                     <li><a href="{% url 'busses-list2' %}">Stops Info</a></li>
+                                    <!-- ***** Get details of a student by entering his roll number ***** -->
+                                    <li><a href="{% url 'student-info' %}">Find a student</a></li>
 
 
                                 </ul>
                             </li>
                             <li class="scroll-to-section"><a href="{% url 'Transport-Reqs' %}">Accept/Reject Request</a></li>
+                            <li class="submenu">
+                                <a href="javascript:;">Delete Allotments</a>
+                                <ul>
+                                    <!-- ***** Search All the Students in a bus using the bus name ***** -->
+                                    <li><a href="">Delete One</a></li>
+                                    <!-- ***** Get details of all the busses, with their driver Info ***** -->
+                                    <li><a href="{% url 'delete-all' %}"onclick="return confirm('Are you sure?')">Delete All</a></li>
+                                    <!-- ***** Get details of all the stops, timings and fees corresponding to the bus ***** -->
+                                </ul>
+                            </li>
                             <li class="scroll-to-section"><a href="{% url 'logout' %}">Logout</a></li>
 
                         </ul>
@@ -160,7 +172,15 @@
         });
 
     </script>
-
+    {% if messages  %}
+        <ul class="messages">
+            {% for message in messages %}
+            <center>
+                <script>alert('{{message}}')</script>
+            </center>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </body>
 
 </html>

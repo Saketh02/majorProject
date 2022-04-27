@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700,800,900&display=swap"
         rel="stylesheet">
 
-    <title>Students Info</title>
+    <title>Student Search</title>
 
     <!-- Additional CSS Files -->
     <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.min.css' %}">
@@ -88,7 +88,7 @@
                     <nav class="main-nav">
                         <!-- ***** Logo Start ***** -->
                         <a href="" class="logo">
-                            Students Information
+                            Student Information
                         </a>
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->
@@ -135,7 +135,7 @@
                 <div class="col-lg-4 col-md-4 col-xs-12">
                     <div class="left-text-content">
                         <div class="section-heading">
-                            <h2>View Students</h2>
+                            <h2>Find a Student</h2>
                         </div>
                         <ul class="contact-info">
 
@@ -152,16 +152,14 @@
 
                         <h2 class="section-heading"><strong></strong></h2>
 
-                        <select name="busName" width="250" STYLE="width: 250px;height: 40px;">
-                            {% if currBus %}
-                                <option value="">{{currBus}}</option>
+                        
+                            {% if not student %}
+                                <input type="text" name="rollNum" placeholder="Roll Number" width="250" STYLE="width: 250px;height: 40px;"  required>
                             {% else %}
-                                <option value="">Select the Bus</option>
+                                <input type="text" name="rollNum" width="250" STYLE="width: 250px;height: 40px;" value={{student}}>
                             {% endif %}
-                            {% for entry in busses %}
-                            <option value="{{ entry}}">{{entry}}</option>
-                            {% endfor %}
-                        </select>
+                           
+    
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <input id="btn1" type="submit" value="Submit">
 
@@ -210,7 +208,7 @@
                             <ul class="messages">
                                 <center>
                                     <div class="alert alert-success" style="height:auto;width:auto">
-                                        Please Select a bus to view all the Allotments
+                                        Please Enter the Roll Number to get the details of a student
                                     </div>
                                 </center>
     

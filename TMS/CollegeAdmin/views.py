@@ -224,7 +224,9 @@ class studentsInfoAPI(APIView):
         if not data:
             messages.error(request, "No Students are alloted to the selected bus")
         return render(
-            request, "students-info.html", {"items": data, "busses": busNames,"currBus":busObj.name}
+            request,
+            "students-info.html",
+            {"items": data, "busses": busNames, "currBus": busObj.name},
         )
 
 
@@ -263,3 +265,18 @@ class stopsInfoAPI(APIView):
             "stops-info.html",
             {"items": data, "busses": busNames, "currBus": busObj.name},
         )
+
+
+class deleteAllAllotmentsAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def get(self, request):
+        busRequest.objects.all().delete()
+        busAllotmentData.objects.all().delete()
+        messages.success(request, "All Allotments are Deleted")
+        return redirect("landing-page")
+
+
+class findStudentPageAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def get(self, request):
+        return render(request, "single-student-info.html")

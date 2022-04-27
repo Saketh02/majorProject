@@ -18,4 +18,6 @@ urlpatterns = [
     path("students-info", views.studentsInfoAPI.as_view(), name="students-info"),
     path("busses-list2", views.bussesListAPI2.as_view(), name="busses-list2"),
     path("stops-info", views.stopsInfoAPI.as_view(), name="stops-info"),
+    path("delete-all",views.deleteAllAllotmentsAPI.as_view(), name="delete-all"),
+    path("student-info",views.findStudentPageAPI.as_view(), name="student-info")
 ]
