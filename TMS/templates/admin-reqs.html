@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700,800,900&display=swap"
         rel="stylesheet">
 
-    <title>Student Search</title>
+    <title>Admin Requests</title>
 
     <!-- Additional CSS Files -->
     <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.min.css' %}">
@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="{% static 'assets/css/owl-carousel.css' %}">
 
     <link rel="stylesheet" href="{% static 'assets/css/lightbox.css' %}">
+
     <style>
         #customers {
             font-family: Arial, Helvetica, sans-serif;
@@ -88,7 +89,7 @@
                     <nav class="main-nav">
                         <!-- ***** Logo Start ***** -->
                         <a href="" class="logo">
-                            Student Information
+                            Admin Requests
                         </a>
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->
@@ -135,7 +136,7 @@
                 <div class="col-lg-4 col-md-4 col-xs-12">
                     <div class="left-text-content">
                         <div class="section-heading">
-                            <h2>Find a Student</h2>
+                            <h2>Accept/Reject Admin Requests</h2>
                         </div>
                         <ul class="contact-info">
 
@@ -146,53 +147,52 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-xs-12">
-
-                    <form id="contact" action="{% url 'find-student' %}" method="POST">
-
-
-                        <h2 class="section-heading"><strong></strong></h2>
-
-                        
-                            {% if not name %}
-                                <input type="text" name="rollNum" placeholder="Roll Number" width="250" STYLE="width: 250px;height: 40px;"  required>
-                            {% else %}
-                                <input type="text" name="rollNum" width="250" STYLE="width: 250px;height: 40px;" value="{{rollNum}}">
-                            {% endif %}
-                           
-    
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        <input id="btn1" type="submit" value="Submit">
-
-
-                    </form>
-                    <br>
-                    <br>
-                    {% if flag %}
+                {% if items %}
+                    <form id="contact" action="{% url 'submit-admin-reqs' %}" method="POST" onsubmit="return validate(this);">
+                    
                         <table id="customers">
                             <tr>
+                                <th>Select</th>
                                 <th>Name</th>
-                                <th>Roll Number</th>
-                                <th>Year</th>
+                                <th>Email</th>
                                 <th>Department</th>
-                                <th>Stop</th>
-                                <th>Bus</th>
-                                <th>Fee Paid</th>
-                                <th>Due</th>
-
+                                <th>Phone</th>
                             </tr>
+                            {%for admin in items%}
                             <tr>
-                                <td>{{name}}</td>
-                                <td>{{rollNum}}</td>
-                                <td>{{year}}</td>
-                                <td>{{department}}</td>
-                                <td>{{stop}}</td>
-                                <td>{{bus}}</td>
-                                <td>{{feePaid}}</td>
-                                <td>{{feeDue}}</td>
+                                <td>
+                                    <center><input id="checkbox+{{forloop.counter}}" type="checkbox" onclick="checkBoxChange(this.id)"/></center>
+                                </td>
+                                <td>{{admin.0}}</td>
+                                <td>{{admin.1}}</td>
+                                <td>{{admin.2}}</td>
+                                <td>{{admin.3}}</td>
+                                <input type="hidden" name="checkboxes" id="checkboxh+{{forloop.counter}}" value="False">
+                                <input type="hidden" name="emails" id="nameh" value="{{admin.1}}">
                             </tr>
+                            {% endfor %}
                         </table>
-                    {% else %}
+                        <br>
+                        <center>
+                            <input id="btn1" name="btn1" type="submit" value="Submit"> &nbsp;&nbsp;
+                            <input id="btn2" name="btn2" type="submit" value="Remove Selected">
+                        </center>
+                        <br>
                         {% if messages  %}
+                            <ul class="messages">
+                                {% for message in messages %}
+                                <center>
+                                    <div class="alert alert-success" style="height:auto;width:auto">
+                                        {{message}}
+                                    </div>
+                                </center>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                    </form>
+                {% else %}
+                    {% if messages  %}
                         <ul class="messages">
                             {% for message in messages %}
                             <center>
@@ -202,21 +202,9 @@
                             </center>
                             {% endfor %}
                         </ul>
-                        {% else %}
-                            <ul class="messages">
-                                <center>
-                                    <div class="alert alert-success" style="height:auto;width:auto">
-                                        Please Enter the Roll Number to get the details of a student
-                                    </div>
-                                </center>
-    
-                        </ul>
-
-                        {% endif %}
-                    <br>
                     {% endif %}
-
-
+                {% endif %}
+                
 
                 </div>
             </div>
@@ -267,26 +255,22 @@
     <script src="{% static 'assets/js/slick.js' %}"></script>
     <script src="{% static 'assets/js/lightbox.js' %}"></script>
     <script src="{% static 'assets/js/isotope.js' %}"></script>
-
     <!-- Global Init -->
     <script src="{% static 'assets/js/custom.js' %}"></script>
 
     <script>
+        function validate(form){
+            return confirm("confirm");
+        }
 
-        $(function () {
-            var selectedClass = "";
-            $("p").click(function () {
-                selectedClass = $(this).attr("data-rel");
-                $("#portfolio").fadeTo(50, 0.1);
-                $("#portfolio div").not("." + selectedClass).fadeOut();
-                setTimeout(function () {
-                    $("." + selectedClass).fadeIn();
-                    $("#portfolio").fadeTo(50, 1);
-                }, 500);
-
-            });
-        });
-
+        function checkBoxChange(id){
+            let checkBox = document.getElementById(id);
+            let counter = id.slice(9);
+            let element = document.getElementById('checkboxh+'.concat(counter));
+            if(checkBox.checked == true){
+               element.value="True"; 
+            }
+        }
     </script>
 
 </body>

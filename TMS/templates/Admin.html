@@ -50,7 +50,6 @@
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->
                         <ul class="nav">
-                            <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
                             <li class="scroll-to-section"><a href="{% url 'add-bus' %}">Add Bus</a></li>
                             <li class="scroll-to-section"><a href="{% url 'add-stops-page' %}">Add Stops</a></li>
                             <li class="submenu">
@@ -68,7 +67,17 @@
 
                                 </ul>
                             </li>
-                            <li class="scroll-to-section"><a href="{% url 'Transport-Reqs' %}">Accept/Reject Request</a></li>
+            
+                            <li class="submenu">
+                                <a href="javascript:;">Accept/Reject Requests</a>
+                                <ul>
+                                    <!-- ***** Search All the Students in a bus using the bus name ***** -->
+                                    <li><a href="{% url 'admin-reqs' %}">Admin Requests</a></li>
+                                    <!-- ***** Get details of all the busses, with their driver Info ***** -->
+                                    <li><a href="{% url 'Transport-Reqs' %}">Transport Requests</a></li>
+                                    <!-- ***** Get details of all the stops, timings and fees corresponding to the bus ***** -->
+                                </ul>
+                            </li>
                             <li class="submenu">
                                 <a href="javascript:;">Delete Allotments</a>
                                 <ul>

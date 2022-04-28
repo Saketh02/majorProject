@@ -1,6 +1,8 @@
+from email import message
+from urllib.robotparser import RequestRate
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from TMS.middleware import authorizationMiddleware
 from django.utils.decorators import method_decorator
 from django.contrib import messages
@@ -8,6 +10,7 @@ from .serializers import addBusDetailsSerializer
 from django.db.models import Q
 from .models import Bus, busStops, busTimings, busRequest, busAllotmentData
 from User.models import Register
+from django.core.mail import send_mail
 
 # Create your views here.
 
@@ -122,6 +125,7 @@ class acceptOrRejectTransportRequestsAPI(APIView):
                 return HttpResponse("Invalid Request", status=404)
             rows = len(rollNums)
             filledBusses = []
+            emails = []
             for i in range(rows):
                 if busNames[i] != "":
                     busObj = Bus.objects.filter(name=busNames[i]).first()
@@ -132,6 +136,7 @@ class acceptOrRejectTransportRequestsAPI(APIView):
                     else:
                         seatNum = count + 1
                     studentObj = Register.objects.filter(rollnum=rollNums[i]).first()
+                    emails.append(studentObj.email)
                     busReqObj = busRequest.objects.filter(student=studentObj).first()
                     stopObj = busReqObj.stop
                     busReqObj.approvedStatus = True
@@ -144,6 +149,13 @@ class acceptOrRejectTransportRequestsAPI(APIView):
                     )
                 else:
                     continue
+            send_mail(
+                "Regarding Transport Request",
+                "Your Transport Request has been approved and a bus has been allotted. Please pay the fee to download bus pass",
+                "kalikotasaketh@gmail.com",
+                emails,
+                fail_silently=True,
+            )
             if filledBusses:
                 messages.success(
                     request,
@@ -160,12 +172,21 @@ class acceptOrRejectTransportRequestsAPI(APIView):
             if not checkBoxes:
                 return HttpResponse("Invalid Request", status=404)
             rows = len(checkBoxes)
+            emails = []
             for i in range(rows):
                 if checkBoxes[i] == "True":
                     rollNum = int(rollNums[i])
                     userObj = Register.objects.filter(rollnum=rollNum).first()
+                    emails.append(userObj.email)
                     transReqObj = busRequest.objects.filter(student=userObj)
                     transReqObj.delete()
+            send_mail(
+                "Regarding Transport Request",
+                "Your Transport Request has been declined, Please reach out to the transport admin",
+                "kalikotasaketh@gmail.com",
+                emails,
+                fail_silently=True,
+            )
             messages.success(request, "Selected Students have been removed")
             return redirect("Transport-Reqs")
         else:
@@ -280,3 +301,80 @@ class findStudentPageAPI(APIView):
     @method_decorator(authorizationMiddleware)
     def get(self, request):
         return render(request, "single-student-info.html")
+
+
+class findStudentAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def post(self, request):
+        if "rollNum" not in request.data:
+            return HttpResponse("Invalid Request", status=404)
+        rollNum = request.data["rollNum"]
+        querySet = Register.objects.filter(rollnum__iexact=rollNum)
+        data = {}
+        if not querySet:
+            data["flag"] = False
+            messages.error(request, "No student found with given roll number")
+        else:
+            data["flag"] = True
+            student = querySet.first()
+            data["name"] = student.name
+            data["rollNum"] = student.rollnum
+            data["year"] = student.year
+            data["department"] = student.department
+            allotmentData = busAllotmentData.objects.filter(student=student)
+            if not allotmentData:
+                data["bus"] = "NA"
+                data["stop"] = "NA"
+                data["feePaid"] = "NA"
+                data["feeDue"] = "NA"
+            else:
+                allotmentObj = allotmentData.first()
+                data["bus"] = allotmentObj.bus.name
+                data["stop"] = allotmentObj.boardingPoint.name
+                data["feePaid"] = allotmentObj.paidAmount
+                data["feeDue"] = allotmentObj.boardingPoint.fee - data["feePaid"]
+
+        return render(request, "single-student-info.html", data)
+
+
+class viewAdminReqsAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def get(self, request):
+        querySet = Register.objects.filter(isAdmin=True, isVerified=False)
+        data = []
+        if not querySet:
+            messages.error(request, "No New Admins registered yet")
+        else:
+            for admin in querySet:
+                name = admin.name
+                email = admin.email
+                department = admin.department
+                phone = admin.mobile
+                tuple = (name, email, department, phone)
+                data.append(tuple)
+        return render(request, "admin-reqs.html", {"items": data})
+
+
+class acceptOrRejectAdminReqsAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def post(self, request):
+        data = request.data
+        checkboxes = data.getlist("checkboxes")
+        emails = data.getlist("emails")
+        if not emails or not checkboxes:
+            return HttpResponse("Invalid Request", status=404)
+        if "btn1" in request.POST:
+            for i in range(0, len(emails)):
+                querySet = Register.objects.filter(email=emails[i])
+                if not querySet:
+                    return HttpResponse("Invalid Request", 404)
+                userObj = querySet.first()
+                userObj.isVerified = True
+                userObj.save()
+            messages.success(request, "Submitted admins were verified")
+        elif "btn2" in request.POST:
+            for i in range(0, len(checkboxes)):
+                if checkboxes[i] == "True":
+                    Register.objects.filter(email=emails[i]).delete()
+            messages.success(request, "Selected admins were removed")
+        return redirect("admin-reqs")

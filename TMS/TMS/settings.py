@@ -138,3 +138,9 @@ AUTH_USER_MODEL = "User.Register"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "sakethkalikota02@gmail.com"
+EMAIL_HOST_PASSWORD = "kalikota saketh"
+EMAIL_USE_TLS = True

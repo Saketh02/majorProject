@@ -3,12 +3,11 @@ from math import exp
 from msilib.schema import ReserveCost
 import django
 from django.shortcuts import redirect, render
-from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from django.contrib.auth import logout
-
+from django.core.mail import send_mail
+from CollegeAdmin.methods import sendBackgroundTask
+from CollegeAdmin.tasks import sendEmailNotifs
 import jwt, datetime
 
 
@@ -29,6 +28,11 @@ class RegisterAPI(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        sendBackgroundTask(sendEmailNotifs,
+            "Regarding User Registration",
+            "Welcome to BVRIT Transport Management Portal. Your Registration has been successful",
+            [request.data["email"]],
+        )
         return HttpResponse("User Registration Successful")
 
 
@@ -52,7 +56,10 @@ class LoginAPI(APIView):
         response = Response()
 
         if user.isAdmin:
-            response = render(request, "Admin.html")
+            if user.isVerified:
+                response = render(request, "Admin.html")
+            else:
+                return HttpResponse("You are yet to be verified by the admin")
         else:
             stops = busStops.objects.values_list("name", flat=True)
             dataDict = {}
@@ -66,7 +73,13 @@ class LoginAPI(APIView):
 class testLogin(APIView):
     @method_decorator(authorizationMiddleware)
     def get(self, request):
-        user = request.user
+        send_mail(
+            "Subject here",
+            "Email Changed.",
+            "kalikotasaketh@gmail.com",
+            ["18211a1253@bvrit.ac.in"],
+            fail_silently=True,
+        )
 
         return HttpResponse("Welcome")
 
