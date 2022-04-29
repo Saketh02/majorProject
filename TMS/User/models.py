@@ -21,4 +21,6 @@ class Register(AbstractUser):
     REQUIRED_FIELDS = ["name", "mobile", "password", "department"]
 
 
-
+class OneTimePassword(models.Model):
+    otp = models.IntegerField()
+    user = models.ForeignKey(Register, on_delete=CASCADE)

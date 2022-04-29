@@ -1,4 +1,6 @@
 from email import message
+from CollegeAdmin.methods import sendBackgroundTask
+from CollegeAdmin.tasks import sendEmailNotifs
 from urllib.robotparser import RequestRate
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
@@ -10,7 +12,7 @@ from .serializers import addBusDetailsSerializer
 from django.db.models import Q
 from .models import Bus, busStops, busTimings, busRequest, busAllotmentData
 from User.models import Register
-from django.core.mail import send_mail
+
 
 # Create your views here.
 
@@ -149,12 +151,11 @@ class acceptOrRejectTransportRequestsAPI(APIView):
                     )
                 else:
                     continue
-            send_mail(
+            sendBackgroundTask(
+                sendEmailNotifs,
                 "Regarding Transport Request",
                 "Your Transport Request has been approved and a bus has been allotted. Please pay the fee to download bus pass",
-                "kalikotasaketh@gmail.com",
                 emails,
-                fail_silently=True,
             )
             if filledBusses:
                 messages.success(
@@ -180,12 +181,11 @@ class acceptOrRejectTransportRequestsAPI(APIView):
                     emails.append(userObj.email)
                     transReqObj = busRequest.objects.filter(student=userObj)
                     transReqObj.delete()
-            send_mail(
+            sendBackgroundTask(
+                sendEmailNotifs,
                 "Regarding Transport Request",
                 "Your Transport Request has been declined, Please reach out to the transport admin",
-                "kalikotasaketh@gmail.com",
                 emails,
-                fail_silently=True,
             )
             messages.success(request, "Selected Students have been removed")
             return redirect("Transport-Reqs")
@@ -371,10 +371,22 @@ class acceptOrRejectAdminReqsAPI(APIView):
                 userObj = querySet.first()
                 userObj.isVerified = True
                 userObj.save()
+            sendBackgroundTask(
+                sendEmailNotifs,
+                "Regarding Admin Account",
+                "Your account is activated now. Please Login and verify",
+                emails,
+            )
             messages.success(request, "Submitted admins were verified")
         elif "btn2" in request.POST:
             for i in range(0, len(checkboxes)):
                 if checkboxes[i] == "True":
                     Register.objects.filter(email=emails[i]).delete()
+            sendBackgroundTask(
+                sendEmailNotifs,
+                "Regarding Admin Account",
+                "Your account activation request has been declined. Please reach out to transport portal admin",
+                emails,
+            )
             messages.success(request, "Selected admins were removed")
         return redirect("admin-reqs")

@@ -1,24 +1,18 @@
-import imp
-from math import exp
-from msilib.schema import ReserveCost
-import django
+from email import message
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
-from django.contrib.auth import logout
-from django.core.mail import send_mail
+from django.contrib import messages
 from CollegeAdmin.methods import sendBackgroundTask
 from CollegeAdmin.tasks import sendEmailNotifs
 import jwt, datetime
-
-
 from .serializers import RegisterSerializer
-
 from rest_framework.response import Response
 from django.http import HttpResponse
-from .models import Register
+from .models import Register, OneTimePassword
 from TMS.middleware import authorizationMiddleware
 from django.utils.decorators import method_decorator
 from CollegeAdmin.models import busStops, busAllotmentData
+from .methods import generateOTP
 
 # Create your views here.
 
@@ -28,7 +22,8 @@ class RegisterAPI(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        sendBackgroundTask(sendEmailNotifs,
+        sendBackgroundTask(
+            sendEmailNotifs,
             "Regarding User Registration",
             "Welcome to BVRIT Transport Management Portal. Your Registration has been successful",
             [request.data["email"]],
@@ -73,14 +68,16 @@ class LoginAPI(APIView):
 class testLogin(APIView):
     @method_decorator(authorizationMiddleware)
     def get(self, request):
-        send_mail(
-            "Subject here",
-            "Email Changed.",
-            "kalikotasaketh@gmail.com",
-            ["18211a1253@bvrit.ac.in"],
-            fail_silently=True,
+        sendBackgroundTask(
+            sendEmailNotifs,
+            "This is a Test",
+            "This is to test the functionality of email notifs in Transport Management Website",
+            [
+                "18211a1253@bvrit.ac.in",
+                "18211a1213@bvrit.ac.in",
+                "18211a1203@bvrit.ac.in",
+            ],
         )
-
         return HttpResponse("Welcome")
 
 
@@ -110,3 +107,64 @@ class landingPageAPI(APIView):
                 ] = allotmentData.first().boardingPoint.name
                 dataDict["user"]["busName"] = allotmentData.first().bus.name
             return render(request, "Student.html", dataDict)
+
+
+class sendOtpPageAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def get(self, request):
+        return render(request, "forgot-password.html")
+
+
+class sendOtpAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def post(self, request):
+        if "email" not in request.data:
+            return HttpResponse("Invalid Request", status=404)
+        email = request.data["email"]
+        querySet = Register.objects.filter(email=email)
+        if not querySet:
+            return HttpResponse("Invalid Request", status=404)
+        userObj = querySet.first()
+        otp = generateOTP()
+        subject = "OTP for Password Reset"
+        message = "The one time password(OTP) for your request is {}.If you haven't initiated this, please ignore this email and do not share otp with anyone".format(
+            otp
+        )
+        sendBackgroundTask(sendEmailNotifs, subject, message, [email])
+        OneTimePassword.objects.create(otp=otp, user=userObj)
+        return render(request, "forgot-password.html", {"flag": True, "email": email})
+
+
+class validateOtpAPI(APIView):
+    @method_decorator(authorizationMiddleware)
+    def post(self, request):
+        data = request.data
+        if "otp" not in data or "pass" not in data or "confPass" not in data:
+            return HttpResponse("Invalid Request", status=404)
+        otp = data["otp"]
+        try:
+            otp = int(otp)
+        except:
+            messages.error(request, "Invalid OTP Format")
+            return render(request, "forgot-password.html", {"done": True})
+        password = data["pass"]
+        confPassword = data["confPass"]
+        if password != confPassword:
+            messages.error(request, "Passwords do not match")
+            return render(request, "forgot-password.html", {"done": True})
+        querySet = OneTimePassword.objects.filter(otp=otp)
+        if not querySet:
+            messages.error(request, "Incorrect OTP")
+            return render(request, "forgot-password.html", {"done": True})
+        userObj = querySet.first().user
+        userObj.set_password(password)
+        userObj.save()
+        sendBackgroundTask(
+            sendEmailNotifs,
+            "Regarding Password Change",
+            "Your Password has been changed successfully",
+            [userObj.email],
+        )
+        OneTimePassword.objects.filter(user=userObj).delete()
+        messages.success(request, "Your Password changed successfully")
+        return render(request, "forgot-password.html", {"done": True})

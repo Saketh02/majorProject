@@ -7,3 +7,6 @@ def sendEmailNotifs(subject, message, recipients):
     send_mail(
         subject, message, "sakethkalikota02@gmail.com", recipients, fail_silently=True
     )
+
+
+# celery worker -A TMS -l info --pool=solo

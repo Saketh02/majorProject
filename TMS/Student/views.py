@@ -1,5 +1,6 @@
 from sre_constants import SUCCESS
-from django.core.mail import send_mail
+from CollegeAdmin.methods import sendBackgroundTask
+from CollegeAdmin.tasks import sendEmailNotifs
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
@@ -42,12 +43,10 @@ class TransportRequestAPI(APIView):
                 return
             stopObj = busStops.objects.filter(name=stopName).first()
             busRequest.objects.create(student=userObj, stop=stopObj)
-            send_mail(
+            sendBackgroundTask(sendEmailNotifs,
                 "Regarding Transport Request",
                 "Transport Request has been successfully submitted",
-                "kalikotasaketh@gmail.com",
                 [request.user.email],
-                fail_silently=True,
             )
             messages.success(request, "Your Transport Request has been submitted")
         return redirect("landing-page")
@@ -157,12 +156,10 @@ class paymentCaptureAPI(APIView):
                 if allotmentObj.paidAmount >= stopObj.fee:
                     allotmentObj.paymentStatus = True
                     allotmentObj.save()
-                send_mail(
+                sendBackgroundTask(sendEmailNotifs,
                     "Regarding Fee Payment",
                     "Your Recent payment was successful, Please login to download your bus pass",
-                    "kalikotasaketh@gmail.com",
                     [request.user.email],
-                    fail_silently=True,
                 )
                 return render(request, "sample.html", {"event": True})
             return render(request, "sample.html", {"event": False})
