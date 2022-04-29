@@ -9,7 +9,7 @@ def sendEmailNotifs(subject, message, recipients):
     )
 
 
-# celery worker -A TMS -l info --pool=solo
+# Command for turning celery job processor on: celery worker -A TMS -l info --pool=solo
 # To add emails from your email, make following changes
 # step-1: login to the account in chrome
 # step-2: goto myaccount.google.com/lesssecureapps and turn it on
