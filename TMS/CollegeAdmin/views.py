@@ -1,4 +1,5 @@
 from email import message
+from lib2to3.pgen2 import driver
 from CollegeAdmin.methods import sendBackgroundTask
 from CollegeAdmin.tasks import sendEmailNotifs
 from urllib.robotparser import RequestRate
@@ -32,6 +33,20 @@ class addBusAPI(APIView):
         busNumber = data["number"]
         driverNumber = data["driverMobile"]
         inchargeNumber = data["inchargeContact"]
+        if driverNumber == inchargeNumber:
+            messages.error(request, "Driver Number and Incharge Number can't be same")
+            return redirect("add-bus")
+        if (
+            len(driverNumber) != 10
+            or len(inchargeNumber) != 10
+            or not inchargeNumber.isdecimal()
+            or not driverNumber.isdecimal()
+        ):
+            messages.error(
+                request,
+                "Invalid Mobile Number(s)",
+            )
+            return redirect("add-bus")
         results = Bus.objects.filter(
             Q(name=busName)
             | Q(number=busNumber)
@@ -80,13 +95,16 @@ class addStopsAPI(APIView):
                 fee = int(data["Fee " + j])
                 stop = data["Stop " + j]
                 time = data["Time " + j]
-            except KeyError:
+            except:
                 continue
             stopObj = busStops.objects.filter(name=stop).first()
             if not stopObj:
                 stopObj = busStops.objects.create(name=stop, fee=fee)
             stopObj.bus.add(busObj)
-            busTimings.objects.create(bus=busObj, time=time, stop=stopObj)
+            res = busTimings.objects.filter(bus=busObj, stop=stopObj)
+            print(res)
+            if not res:
+                busTimings.objects.create(bus=busObj, time=time, stop=stopObj)
             messages.success(request, "Details were succesfully saved")
         return redirect("add-stops-page")
 

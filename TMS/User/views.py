@@ -13,22 +13,69 @@ from TMS.middleware import authorizationMiddleware
 from django.utils.decorators import method_decorator
 from CollegeAdmin.models import busStops, busAllotmentData
 from .methods import generateOTP
+from django.core.mail import send_mail
+
+import re
 
 # Create your views here.
 
 
 class RegisterAPI(APIView):
     def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        sendBackgroundTask(
-            sendEmailNotifs,
-            "Regarding User Registration",
-            "Welcome to BVRIT Transport Management Portal. Your Registration has been successful",
-            [request.data["email"]],
-        )
-        return HttpResponse("User Registration Successful")
+        data = request.data
+        serializer = RegisterSerializer(data=data)
+        departments = {
+            "BSH",
+            "IT",
+            "CSE",
+            "BME",
+            "CHE",
+            "CIVIL",
+            "MECH",
+            "PHE",
+            "MBA",
+            "ECE",
+            "EEE",
+            "AIDS",
+            "CSBS",
+            "CSEDS",
+            "CSEAIML",
+        }
+        try:
+            password = data["password"]
+            confirmPassword = data["confPass"]
+            department = data["department"]
+            mobile = data["mobile"]
+            isAdmin = data["isAdmin"]
+            print(isAdmin)
+            if department not in departments:
+                messages.error(
+                    request,
+                    "Invalid Department, Valid options are {}".format(departments),
+                )
+                return render(request, "index.html", {"register": True})
+            if password != confirmPassword:
+                messages.error(request, "Passwords do not match, Please verify")
+                return render(request, "index.html", {"register": True})
+            if len(mobile) > 10 or not mobile.isdecimal():
+                messages.error(request, "Invalid Mobile Number")
+                return render(request, "index.html", {"register": True})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            sendBackgroundTask(
+                sendEmailNotifs,
+                "Regarding User Registration",
+                "Welcome to BVRIT Transport Management Portal. Your Registration has been successful",
+                [request.data["email"]],
+            )
+            messages.success(request, "User Registration Successful")
+        except:
+            messages.error(
+                request,
+                "Error in creating the user, User with username or email already exists or Invalid Request",
+            )
+        finally:
+            return render(request, "index.html", {"register": True})
 
 
 class LoginAPI(APIView):
@@ -39,9 +86,11 @@ class LoginAPI(APIView):
         password = request.data["password"]
         user = Register.objects.filter(email=email).first()
         if user is None:
-            return HttpResponse("Invalid Credentials")
+            messages.error(request, "Incorrect Email Id")
+            return render(request, "index.html", {"login": True})
         if not user.check_password(password):
-            return HttpResponse("Email ID or Password is Incorrect")
+            messages.error(request, "Username or Password is incorrect")
+            return render(request, "index.html", {"login": True})
         payload = {
             "id": user.id,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
@@ -54,12 +103,19 @@ class LoginAPI(APIView):
             if user.isVerified:
                 response = render(request, "Admin.html")
             else:
-                return HttpResponse("You are yet to be verified by the admin")
+                messages.error(request, "You are yet to be verified by the admin")
+                return render(request, "index.html", {"login": True})
         else:
             stops = busStops.objects.values_list("name", flat=True)
             dataDict = {}
             dataDict["stops"] = stops
             dataDict["user"] = user.__dict__
+            allotmentData = busAllotmentData.objects.filter(student=user)
+            if allotmentData:
+                dataDict["user"][
+                    "boardingPoint"
+                ] = allotmentData.first().boardingPoint.name
+                dataDict["user"]["busName"] = allotmentData.first().bus.name
             response = render(request, "student.html", dataDict)
         response.set_cookie(key="jwt", value=token, httponly=True)
         return response
@@ -70,13 +126,9 @@ class testLogin(APIView):
     def get(self, request):
         sendBackgroundTask(
             sendEmailNotifs,
-            "This is a Test",
-            "This is to test the functionality of email notifs in Transport Management Website",
-            [
-                "18211a1253@bvrit.ac.in",
-                "18211a1213@bvrit.ac.in",
-                "18211a1203@bvrit.ac.in",
-            ],
+            "subject",
+            "Hi There",
+            ["18211a1253@bvrit.ac.in"],
         )
         return HttpResponse("Welcome")
 
@@ -106,17 +158,16 @@ class landingPageAPI(APIView):
                     "boardingPoint"
                 ] = allotmentData.first().boardingPoint.name
                 dataDict["user"]["busName"] = allotmentData.first().bus.name
+                print(dataDict)
             return render(request, "Student.html", dataDict)
 
 
 class sendOtpPageAPI(APIView):
-    @method_decorator(authorizationMiddleware)
     def get(self, request):
         return render(request, "forgot-password.html")
 
 
 class sendOtpAPI(APIView):
-    @method_decorator(authorizationMiddleware)
     def post(self, request):
         if "email" not in request.data:
             return HttpResponse("Invalid Request", status=404)
@@ -136,7 +187,6 @@ class sendOtpAPI(APIView):
 
 
 class validateOtpAPI(APIView):
-    @method_decorator(authorizationMiddleware)
     def post(self, request):
         data = request.data
         if "otp" not in data or "pass" not in data or "confPass" not in data:

@@ -15,6 +15,7 @@ def authorizationMiddleware(get_response):
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             return HttpResponse("Please Login again", status=404)
+        print(payload)
         user = Register.objects.get(id=payload["id"])
         request.user = user
         response = get_response(request)

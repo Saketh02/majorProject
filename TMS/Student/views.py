@@ -43,7 +43,8 @@ class TransportRequestAPI(APIView):
                 return
             stopObj = busStops.objects.filter(name=stopName).first()
             busRequest.objects.create(student=userObj, stop=stopObj)
-            sendBackgroundTask(sendEmailNotifs,
+            sendBackgroundTask(
+                sendEmailNotifs,
                 "Regarding Transport Request",
                 "Transport Request has been successfully submitted",
                 [request.user.email],
@@ -156,10 +157,11 @@ class paymentCaptureAPI(APIView):
                 if allotmentObj.paidAmount >= stopObj.fee:
                     allotmentObj.paymentStatus = True
                     allotmentObj.save()
-                sendBackgroundTask(sendEmailNotifs,
+                sendBackgroundTask(
+                    sendEmailNotifs,
                     "Regarding Fee Payment",
                     "Your Recent payment was successful, Please login to download your bus pass",
-                    [request.user.email],
+                    [paymentObj.student.email],
                 )
                 return render(request, "sample.html", {"event": True})
             return render(request, "sample.html", {"event": False})
@@ -208,6 +210,5 @@ class viewBusPassAPI(APIView):
                     data["time"] = busTimings.objects.filter(stop=stopObj).first().time
                     data["flag"] = True
                     return render(request, "bus-pass.html", data)
-        else:
-            messages.error(request, "Please submit a transport request and pay the fee")
+        messages.error(request, "Please submit a transport request or if you have submitted, pay atleast half of the fee")
         return render(request, "bus-pass.html", {"flag": False})
