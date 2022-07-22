@@ -86,7 +86,7 @@ class LoginAPI(APIView):
         password = request.data["password"]
         user = Register.objects.filter(email=email).first()
         if user is None:
-            messages.error(request, "Incorrect Email Id")
+            messages.error(request, "Incorrect Email Id or User doesn't exist")
             return render(request, "index.html", {"login": True})
         if not user.check_password(password):
             messages.error(request, "Username or Password is incorrect")

@@ -2,10 +2,10 @@ from email import message
 from lib2to3.pgen2 import driver
 from CollegeAdmin.methods import sendBackgroundTask
 from CollegeAdmin.tasks import sendEmailNotifs
-from urllib.robotparser import RequestRate
+
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse
 from TMS.middleware import authorizationMiddleware
 from django.utils.decorators import method_decorator
 from django.contrib import messages
